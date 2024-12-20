@@ -1,0 +1,58 @@
+common_tags:
+  ManagedBy: "Terraform"
+  Organization: "YourCompany"
+  Project: "Infrastructure"
+
+terraform_required_version: ">= 1.0"
+terragrunt_required_version: ">= 0.45"
+
+aws_provider_version: "~> 5.0"
+kubernetes_provider_version: "~> 2.23"
+helm_provider_version: "~> 2.11"
+
+# Default AWS region
+default_region: "ap-south-1"
+
+# Resource naming convention
+resource_prefix: "infra"
+environment_prefixes:
+  dev: "dev"
+  staging: "stg"
+  prod: "prd"
+
+# Network configuration
+vpc_cidr_blocks:
+  dev: "10.0.0.0/16"
+  staging: "10.1.0.0/16"
+  prod: "10.2.0.0/16"
+
+# EKS configuration
+eks_versions:
+  dev: "1.27"
+  staging: "1.27"
+  prod: "1.27"
+
+# RDS configuration
+rds_instance_types:
+  dev: "db.t3.medium"
+  staging: "db.t3.large"
+  prod: "db.r6g.xlarge"
+
+# ElastiCache configuration
+elasticache_instance_types:
+  dev: "cache.t3.medium"
+  staging: "cache.t3.large"
+  prod: "cache.r6g.xlarge"
+
+# Backup retention periods
+backup_retention_days:
+  dev: 7
+  staging: 14
+  prod: 30
+
+# Monitoring configuration
+monitoring_config:
+  metrics_retention_days: 90
+  log_retention_days: 90
+  alarm_evaluation_periods: 3
+  alarm_datapoints_to_alarm: 2

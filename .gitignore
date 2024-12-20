@@ -1,0 +1,58 @@
+# Terraform files
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+*.tfvars
+!example.tfvars
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc
+.terraform.lock.hcl
+
+# Terragrunt files
+.terragrunt-cache
+terragrunt.iml
+.terragrunt-source-manifest
+.terragrunt-module-manifest
+.terragrunt-external-dependency
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+*.sublime-workspace
+*.sublime-project
+
+# OS files
+.DS_Store
+Thumbs.db
+*.tmp
+*.bak
+*~
+
+# Local environment files
+.env
+.envrc
+*.env
+.env.*
+!.env.example
+
+# Generated files
+*.generated.*
+*generated.tf
+*.log
+.terraform.tfstate.lock.info
+
+# Dependency directories
+vendor/
+
+# Backup files
+*.backup
+*.bak
+*.orig
