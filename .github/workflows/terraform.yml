@@ -1,0 +1,109 @@
+name: 'Terraform CI/CD'
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+
+permissions:
+  contents: read
+  pull-requests: write
+
+env:
+  AWS_REGION: 'ap-south-1'
+  TERRAFORM_VERSION: '1.5.7'
+  TERRAGRUNT_VERSION: '0.50.0'
+
+jobs:
+  terraform:
+    name: 'Terraform'
+    runs-on: ubuntu-latest
+    environment: ${{ github.ref == 'refs/heads/main' && 'production' || 'development' }}
+
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./terraform-aws
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+
+      - name: Install Terragrunt
+        run: |
+          wget -O terragrunt https://github.com/gruntwork-io/terragrunt/releases/download/v${{ env.TERRAGRUNT_VERSION }}/terragrunt_linux_amd64
+          chmod +x terragrunt
+          sudo mv terragrunt /usr/local/bin/
+
+      - name: Terragrunt Format Check
+        id: fmt
+        run: terragrunt hclfmt --terragrunt-check
+        continue-on-error: true
+
+      - name: Terragrunt Init
+        id: init
+        run: terragrunt run-all init
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Terragrunt Validate
+        id: validate
+        run: terragrunt run-all validate
+
+      - name: Terragrunt Plan
+        id: plan
+        run: |
+          terragrunt run-all plan -detailed-exitcode -no-color -out=tfplan 2>&1 | tee plan.txt
+        continue-on-error: true
+
+      - name: Update Pull Request
+        uses: actions/github-script@v7
+        if: github.event_name == 'pull_request'
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const plan = fs.readFileSync('terraform-aws/plan.txt', 'utf8');
+            const maxGitHubBodyLength = 65536;
+            const planOutput = plan.length > maxGitHubBodyLength
+              ? plan.substr(0, maxGitHubBodyLength) + "\n\n... Output truncated due to length ..."
+              : plan;
+            
+            const comment = `#### Terraform Plan 📝
+            <details><summary>Show Plan</summary>
+            
+            \`\`\`terraform
+            ${planOutput}
+            \`\`\`
+            
+            </details>
+            
+            *Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            })
+
+      # - name: Terragrunt Apply
+      #   if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      #   run: terragrunt run-all apply -auto-approve tfplan
