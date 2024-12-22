@@ -70,22 +70,22 @@ resource "aws_elasticache_replication_group" "redis" {
 
   replication_group_id = var.cluster_id
   description          = "Redis cluster for ${var.cluster_id}"
-  
-  node_type            = var.node_type
-  port                 = var.port
-  
+
+  node_type = var.node_type
+  port      = var.port
+
   num_cache_clusters         = var.num_cache_nodes
   automatic_failover_enabled = var.num_cache_nodes > 1
 
-  subnet_group_name    = aws_elasticache_subnet_group.this.name
-  security_group_ids   = [aws_security_group.this.id]
-  
+  subnet_group_name  = aws_elasticache_subnet_group.this.name
+  security_group_ids = [aws_security_group.this.id]
+
   engine               = "redis"
-  engine_version      = var.engine_version
+  engine_version       = var.engine_version
   parameter_group_name = aws_elasticache_parameter_group.this.name
 
   maintenance_window = var.maintenance_window
-  snapshot_window   = var.snapshot_window
+  snapshot_window    = var.snapshot_window
 
   tags = var.tags
 }
@@ -94,14 +94,14 @@ resource "aws_elasticache_cluster" "memcached" {
   count = var.engine == "memcached" ? 1 : 0
 
   cluster_id           = var.cluster_id
-  engine              = "memcached"
-  node_type           = var.node_type
-  num_cache_nodes     = var.num_cache_nodes
+  engine               = "memcached"
+  node_type            = var.node_type
+  num_cache_nodes      = var.num_cache_nodes
   parameter_group_name = aws_elasticache_parameter_group.this.name
-  port                = var.port
+  port                 = var.port
 
-  subnet_group_name    = aws_elasticache_subnet_group.this.name
-  security_group_ids   = [aws_security_group.this.id]
+  subnet_group_name  = aws_elasticache_subnet_group.this.name
+  security_group_ids = [aws_security_group.this.id]
 
   maintenance_window = var.maintenance_window
 

@@ -48,7 +48,7 @@ inputs = {
     max     = local.node_groups.max
     desired = local.node_groups.desired
   }
-  
+
   tags = merge(local.tags, {
     Service = "EKS"
     Cluster = local.cluster_name

@@ -21,7 +21,7 @@ terraform {
 
 inputs = {
   cluster_name = local.env_vars.locals.cluster_name
-  vpc_cidr = local.vpc_cidr
+  vpc_cidr     = local.vpc_cidr
 
   public_subnets  = [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 4, k)]
   private_subnets = [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 4, k + 3)]

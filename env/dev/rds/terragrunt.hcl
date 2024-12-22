@@ -12,7 +12,18 @@ dependency "vpc" {
   mock_outputs = {
     vpc_id             = "vpc-00000000"
     private_subnet_ids = ["subnet-00000000", "subnet-11111111"]
-    vpc_cidr          = "10.0.0.0/16"
+    vpc_cidr           = "10.0.0.0/16"
+  }
+}
+
+dependency "ssm" {
+  config_path = "../ssm"
+
+  mock_outputs = {
+    parameter_names = {
+      username = "/dev/rds/username"
+      password = "/dev/rds/password"
+    }
   }
 }
 
@@ -39,10 +50,10 @@ inputs = {
   instance_class    = local.rds_instance_type
   allocated_storage = 20
 
-  db_name  = local.rds_config.db_name
-  username = local.rds_config.username
-  password = "DevPassword123$"  # Using only allowed special characters
-  port     = 5432
+  db_name                = local.rds_config.db_name
+  username_ssm_parameter = dependency.ssm.outputs.parameter_names.username
+  password_ssm_parameter = dependency.ssm.outputs.parameter_names.password
+  port                   = 5432
 
   # VPC Configuration
   vpc_id              = dependency.vpc.outputs.vpc_id
@@ -54,13 +65,13 @@ inputs = {
   backup_window      = "03:00-06:00"
 
   # Multi-AZ and Storage
-  multi_az               = false
+  multi_az              = false
   storage_type          = "gp3"
   max_allocated_storage = 100
 
   # Backup and Maintenance
   backup_retention_period = 7
-  skip_final_snapshot    = true
+  skip_final_snapshot     = true
 
   # Tags
   tags = merge(local.tags, {

@@ -39,15 +39,14 @@ variable "storage_encrypted" {
   default     = true
 }
 
-variable "username" {
-  description = "Username for the master DB user"
+variable "username_ssm_parameter" {
+  description = "SSM parameter name for RDS username"
   type        = string
 }
 
-variable "password" {
-  description = "Password for the master DB user"
+variable "password_ssm_parameter" {
+  description = "SSM parameter name for RDS password"
   type        = string
-  sensitive   = true
 }
 
 variable "port" {

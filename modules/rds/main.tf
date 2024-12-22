@@ -1,3 +1,11 @@
+data "aws_ssm_parameter" "username" {
+  name = var.username_ssm_parameter
+}
+
+data "aws_ssm_parameter" "password" {
+  name = var.password_ssm_parameter
+}
+
 locals {
   tags = merge(
     var.tags,
@@ -62,8 +70,8 @@ resource "aws_db_instance" "this" {
   storage_type      = var.storage_type
   storage_encrypted = var.storage_encrypted
 
-  username = var.username
-  password = var.password
+  username = data.aws_ssm_parameter.username.value
+  password = data.aws_ssm_parameter.password.value
   port     = var.port
 
   vpc_security_group_ids = [aws_security_group.this.id]
