@@ -1,80 +1,177 @@
-# AWS EKS Terraform Module
+# AWS Infrastructure as Code with Terraform
 
-This Terraform module creates an Amazon EKS (Elastic Kubernetes Service) cluster along with the necessary IAM roles and node groups.
+This repository contains Terraform modules and configurations for deploying and managing AWS infrastructure components using Infrastructure as Code (IaC) principles.
 
-## Features
+## Repository Structure
 
-- Creates an EKS cluster
-- Sets up IAM roles and policies for the cluster and node groups
-- Creates an EKS node group with customizable instance types and scaling options
-- Configurable private/public endpoint access
-- Customizable tags
+```
+.
+├── bootstrap/          # Bootstrap configurations
+├── compositions/       # Reusable infrastructure compositions
+├── config/            # Configuration files
+├── env/              # Environment-specific configurations
+│   └── dev/          # Development environment
+├── modules/          # Reusable Terraform modules
+│   ├── eks-cluster/     # EKS cluster module
+│   ├── eks-node-group/  # EKS node group module
+│   ├── elasticache/     # ElastiCache module
+│   ├── iam-roles/       # IAM roles and policies
+│   ├── msk/             # Managed Streaming for Kafka
+│   ├── rds/             # RDS database module
+│   ├── s3/              # S3 bucket module
+│   ├── security-groups/ # Security groups module
+│   ├── ssm/             # Systems Manager module
+│   ├── vpc/             # VPC networking module
+│   └── waf/             # Web Application Firewall module
+└── scripts/           # Utility scripts
+```
+
+## Available Modules
+
+This repository includes the following AWS infrastructure modules:
+
+- **VPC**: Network infrastructure setup
+- **EKS**: Elastic Kubernetes Service cluster and node groups
+- **RDS**: Relational Database Service configurations
+- **ElastiCache**: In-memory caching service
+- **MSK**: Managed Streaming for Kafka
+- **WAF**: Web Application Firewall rules
+- **IAM**: Identity and Access Management roles and policies
+- **Security Groups**: Network security configurations
+- **SSM**: Systems Manager configurations
+- **S3**: Simple Storage Service bucket configurations
+
+## Prerequisites
+
+- Terraform >= 1.0
+- AWS CLI configured with appropriate credentials
+- AWS Provider >= 4.0
 
 ## Usage
 
-```hcl
-module "eks" {
-  source = "path/to/module"
-
-  cluster_name    = "my-eks-cluster"
-  kubernetes_version = "1.27"
-  
-  subnet_ids = [
-    "subnet-xxxxxxxx",
-    "subnet-yyyyyyyy"
-  ]
-
-  endpoint_private_access = true
-  endpoint_public_access  = true
-
-  node_desired_size = 2
-  node_max_size     = 4
-  node_min_size     = 1
-
-  instance_types = ["t3.medium"]
-  disk_size      = 20
-
-  tags = {
-    Environment = "dev"
-    Terraform   = "true"
-  }
-}
+1. Clone the repository:
+```bash
+git clone https://github.com/balaji-singh/terraform-aws.git
 ```
 
-## Requirements
+2. Navigate to the desired environment directory:
+```bash
+cd env/dev
+```
 
-- Terraform >= 1.0
-- AWS Provider >= 4.0
-- An existing VPC with subnets
+3. Initialize Terraform:
+```bash
+terraform init
+```
 
-## Inputs
+4. Review the planned changes:
+```bash
+terraform plan
+```
 
-| Name | Description | Type | Default | Required |
-|------|-------------|------|---------|----------|
-| cluster_name | Name of the EKS cluster | string | n/a | yes |
-| kubernetes_version | Kubernetes version | string | "1.27" | no |
-| subnet_ids | List of subnet IDs | list(string) | n/a | yes |
-| endpoint_private_access | Enable private API endpoint | bool | false | no |
-| endpoint_public_access | Enable public API endpoint | bool | true | no |
-| node_desired_size | Desired number of worker nodes | number | 2 | no |
-| node_max_size | Maximum number of worker nodes | number | 4 | no |
-| node_min_size | Minimum number of worker nodes | number | 1 | no |
-| instance_types | List of instance types for the node group | list(string) | ["t3.medium"] | no |
-| disk_size | Disk size in GiB for worker nodes | number | 20 | no |
-| tags | A map of tags to add to all resources | map(string) | {} | no |
+5. Apply the changes:
+```bash
+terraform apply
+```
 
-## Outputs
+## Environment Configuration
 
-| Name | Description |
-|------|-------------|
-| cluster_id | The name/id of the EKS cluster |
-| cluster_arn | The Amazon Resource Name (ARN) of the cluster |
-| cluster_endpoint | The endpoint for the EKS control plane |
-| cluster_security_group_id | Security group ID attached to the EKS cluster |
-| cluster_certificate_authority_data | Base64 encoded certificate data for cluster |
-| node_group_id | EKS node group ID |
-| node_group_arn | Amazon Resource Name (ARN) of the EKS Node Group |
+The `env/` directory contains environment-specific configurations. Each environment (e.g., dev, staging, prod) can have its own configuration values while using the same underlying modules.
+
+## Module Documentation
+
+Each module in the `modules/` directory contains its own README with detailed configuration options and usage examples. Refer to individual module documentation for specific configuration options.
+
+## Make Commands
+
+The repository includes several make commands to help manage the infrastructure. You can use these commands with optional environment variables `ENV` (default: dev) and `COMPONENT`.
+
+### Core Infrastructure Commands
+
+```bash
+# Initialize Terraform/Terragrunt for all components
+make init
+
+# Plan changes for all components
+make plan
+
+# Apply changes for all components
+make apply
+
+# Destroy all components
+make destroy
+```
+
+### Development Commands
+
+```bash
+# Format Terraform and Terragrunt files
+make fmt
+
+# Validate Terraform configurations
+make validate
+
+# Generate documentation
+make docs
+
+# Run tests
+make test
+
+# Run security scans (tfsec, checkov, terrascan)
+make security-scan
+
+# Clean all temporary Terraform files
+make clean
+```
+
+### Helper Commands
+
+```bash
+# Initialize, format, validate, and generate docs
+make init-all
+
+# List all available workspaces
+make list-workspaces
+
+# Generate cost estimates using Infracost
+make cost-estimate
+```
+
+### Using with Specific Environments
+
+You can specify the environment using the `ENV` variable:
+
+```bash
+# Plan changes for production environment
+make plan ENV=prod
+
+# Apply changes for staging environment
+make apply ENV=staging
+```
+
+### Prerequisites for Make Commands
+
+Ensure you have the following tools installed:
+- Terraform
+- Terragrunt
+- tfsec
+- checkov
+- terrascan
+- infracost (for cost estimation)
+- Go (for running tests)
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
 
 ## License
 
 MIT
+
+## Support
+
+For support and questions, please open an issue in the repository.
