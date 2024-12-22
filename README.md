@@ -30,16 +30,78 @@ This repository contains Terraform modules and configurations for deploying and 
 
 This repository includes the following AWS infrastructure modules:
 
-- **VPC**: Network infrastructure setup
-- **EKS**: Elastic Kubernetes Service cluster and node groups
-- **RDS**: Relational Database Service configurations
-- **ElastiCache**: In-memory caching service
-- **MSK**: Managed Streaming for Kafka
-- **WAF**: Web Application Firewall rules
-- **IAM**: Identity and Access Management roles and policies
-- **Security Groups**: Network security configurations
-- **SSM**: Systems Manager configurations
-- **S3**: Simple Storage Service bucket configurations
+### Networking
+- **VPC** (`vpc/`): 
+  - Complete networking setup with public/private subnets
+  - NAT Gateways for private subnet internet access
+  - Custom route tables and network ACLs
+  - VPC endpoints for AWS services
+
+### Container & Orchestration
+- **EKS Cluster** (`eks-cluster/`):
+  - Managed Kubernetes control plane setup
+  - OIDC provider integration
+  - Cluster security group configuration
+  - Kubernetes API endpoint management
+
+- **EKS Node Group** (`eks-node-group/`):
+  - Auto-scaling worker node groups
+  - Custom launch templates
+  - Node IAM role configuration
+  - Spot instance support
+
+### Database & Caching
+- **RDS** (`rds/`):
+  - Managed relational databases (MySQL, PostgreSQL)
+  - Multi-AZ deployment options
+  - Automated backups and maintenance windows
+  - Parameter group customization
+
+- **ElastiCache** (`elasticache/`):
+  - Redis/Memcached clusters
+  - Multi-AZ replication groups
+  - Automatic failover configuration
+  - Subnet group management
+
+### Messaging & Streaming
+- **MSK** (`msk/`):
+  - Managed Kafka clusters
+  - Multi-AZ broker deployment
+  - Custom configuration settings
+  - Security group management
+
+### Security & Access Control
+- **WAF** (`waf/`):
+  - Web Application Firewall rules
+  - SQL injection protection
+  - Rate limiting rules
+  - Geographic restrictions
+
+- **IAM Roles** (`iam-roles/`):
+  - Service-linked roles
+  - Cross-account access policies
+  - Least privilege permissions
+  - Resource-based policies
+
+- **Security Groups** (`security-groups/`):
+  - Granular network access controls
+  - Service-specific rule sets
+  - Dynamic security group references
+  - Egress rules management
+
+### Management & Monitoring
+- **SSM** (`ssm/`):
+  - Systems Manager parameter store
+  - Secure string parameter management
+  - Parameter hierarchies
+  - Cross-account parameter sharing
+
+### Storage
+- **S3** (`s3/`):
+  - Bucket creation and configuration
+  - Versioning and lifecycle rules
+  - Server-side encryption
+  - Cross-region replication setup
 
 ## Prerequisites
 
@@ -159,4 +221,3 @@ Ensure you have the following tools installed:
 - terrascan
 - infracost (for cost estimation)
 - Go (for running tests)
-
