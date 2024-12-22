@@ -1,6 +1,6 @@
 common_tags:
   ManagedBy: "Terraform"
-  Organization: "YourCompany"
+  Organization: "ABC"
   Project: "Infrastructure"
 
 terraform_required_version: ">= 1.0"

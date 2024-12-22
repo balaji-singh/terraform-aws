@@ -5,7 +5,7 @@ locals {
   # Environment specific variables
   environment_vars = read_terragrunt_config(find_in_parent_folders("env.hcl"))
   environment      = local.environment_vars.locals.environment
-  organization     = "YourCompany"
+  organization     = "ABC"
   aws_region       = local.environment_vars.locals.aws_region
 
   # Resource naming
