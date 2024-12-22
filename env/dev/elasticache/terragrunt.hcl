@@ -10,9 +10,9 @@ dependency "vpc" {
   config_path = "../vpc"
 
   mock_outputs = {
-    vpc_id          = "vpc-00000000"
-    private_subnets = ["subnet-00000000", "subnet-11111111"]
-    vpc_cidr_block  = "10.0.0.0/16"
+    vpc_id             = "vpc-0a1234567890abcdef"
+    private_subnet_ids = ["subnet-00000000", "subnet-11111111"]
+    vpc_cidr_block     = "10.0.0.0/16"
   }
 }
 
@@ -37,7 +37,8 @@ inputs = {
   num_cache_nodes = local.cache_config.num_cache_nodes
   port            = 6379
 
-  subnet_ids         = dependency.vpc.outputs.private_subnets
+  vpc_id             = dependency.vpc.outputs.vpc_id
+  subnet_ids         = dependency.vpc.outputs.private_subnet_ids
   security_group_ids = [] # Add security group IDs
 
   parameter_group_family = "redis7"
@@ -59,7 +60,6 @@ inputs = {
 
   # Tags
   tags = merge(local.tags, {
-    Service = "ElastiCache"
-    Engine  = local.cache_config.engine
+    Service = "Redis"
   })
 }

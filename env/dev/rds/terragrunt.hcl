@@ -10,9 +10,9 @@ dependency "vpc" {
   config_path = "../vpc"
 
   mock_outputs = {
-    vpc_id          = "vpc-00000000"
-    private_subnets = ["subnet-00000000", "subnet-11111111"]
-    vpc_cidr_block  = "10.0.0.0/16"
+    vpc_id             = "vpc-00000000"
+    private_subnet_ids = ["subnet-00000000", "subnet-11111111"]
+    vpc_cidr          = "10.0.0.0/16"
   }
 }
 
@@ -41,37 +41,29 @@ inputs = {
 
   db_name  = local.rds_config.db_name
   username = local.rds_config.username
+  password = "DevPassword123$"  # Using only allowed special characters
   port     = 5432
 
-  vpc_security_group_ids = [] # Add security group IDs
-  subnet_ids             = dependency.vpc.outputs.private_subnets
+  # VPC Configuration
+  vpc_id              = dependency.vpc.outputs.vpc_id
+  subnet_ids          = dependency.vpc.outputs.private_subnet_ids
+  allowed_cidr_blocks = [dependency.vpc.outputs.vpc_cidr]
 
+  # Maintenance Windows
   maintenance_window = "Mon:00:00-Mon:03:00"
   backup_window      = "03:00-06:00"
 
-  # Backups
+  # Multi-AZ and Storage
+  multi_az               = false
+  storage_type          = "gp3"
+  max_allocated_storage = 100
+
+  # Backup and Maintenance
   backup_retention_period = 7
-  skip_final_snapshot     = true
-
-  # Enhanced Monitoring
-  monitoring_interval = 60
-  monitoring_role_arn = "arn:aws:iam::${local.account_id}:role/rds-monitoring-role"
-
-  # DB subnet group
-  create_db_subnet_group = true
-
-  # DB parameter group
-  family = "postgres14"
-
-  # DB option group
-  major_engine_version = "14"
-
-  # Multi AZ
-  multi_az = false # Set to true for production
+  skip_final_snapshot    = true
 
   # Tags
   tags = merge(local.tags, {
-    Service = "RDS"
-    Engine  = local.rds_config.engine
+    Service = "PostgreSQL"
   })
 }

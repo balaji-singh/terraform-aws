@@ -41,46 +41,14 @@ inputs = {
   cluster_version = local.cluster_version
 
   vpc_id     = dependency.vpc.outputs.vpc_id
-  subnet_ids = dependency.vpc.outputs.private_subnets
+  subnet_ids = dependency.vpc.outputs.private_subnet_ids
 
-  node_groups = {
-    main = {
-      desired_size = local.node_groups.desired
-      max_size     = local.node_groups.max
-      min_size     = local.node_groups.min
-
-      instance_types = ["t3.medium"]
-      capacity_type  = "ON_DEMAND"
-
-      labels = {
-        Environment = local.environment
-        NodeGroup   = "main"
-      }
-
-      taints = []
-
-      update_config = {
-        max_unavailable_percentage = 50
-      }
-    }
+  node_group_size = {
+    min     = local.node_groups.min
+    max     = local.node_groups.max
+    desired = local.node_groups.desired
   }
-
-  # Enable IRSA
-  enable_irsa = true
-
-  # Extend cluster security group rules
-  cluster_security_group_additional_rules = {
-    egress_nodes_ephemeral_ports_tcp = {
-      description                = "To node 1025-65535"
-      protocol                   = "tcp"
-      from_port                  = 1025
-      to_port                    = 65535
-      type                       = "egress"
-      source_node_security_group = true
-    }
-  }
-
-  # Tags
+  
   tags = merge(local.tags, {
     Service = "EKS"
     Cluster = local.cluster_name

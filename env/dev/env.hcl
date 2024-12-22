@@ -22,7 +22,7 @@ locals {
   rds_instance_type = "db.t3.medium"
   rds_config = {
     engine         = "postgres"
-    engine_version = "14.7"
+    engine_version = "14.10"
     db_name        = "appdb"
     username       = "dbadmin"
   }
