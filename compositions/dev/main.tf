@@ -15,6 +15,20 @@ provider "aws" {
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
+# Local Variables
+# ---------------------------------------------------------------------------------------------------------------------
+
+locals {
+  environment   = "dev"
+  cluster_name  = "${local.environment}-cluster"
+  tags = {
+    Environment = local.environment
+    Terraform   = "true"
+    Project     = var.project_name
+  }
+}
+
+# ---------------------------------------------------------------------------------------------------------------------
 # VPC Module
 # ---------------------------------------------------------------------------------------------------------------------
 
@@ -119,4 +133,30 @@ module "eks_node_group" {
   module_depends_on = [
     module.eks_cluster
   ]
+}
+
+# ---------------------------------------------------------------------------------------------------------------------
+# MSK Module
+# ---------------------------------------------------------------------------------------------------------------------
+
+module "msk" {
+  source = "../../modules/msk"
+
+  cluster_name           = "${local.environment}-kafka"
+  kafka_version         = "2.8.1"
+  number_of_broker_nodes = 3
+  broker_instance_type  = "kafka.t3.small"
+  broker_volume_size    = 100
+
+  vpc_id     = module.vpc.vpc_id
+  subnet_ids = module.vpc.private_subnet_ids
+
+  auto_create_topics_enable     = false
+  default_replication_factor    = 3
+  min_insync_replicas          = 2
+  num_partitions               = 3
+  client_broker_encryption     = "TLS"
+  log_retention_days           = 7
+
+  tags = local.tags
 }
