@@ -81,7 +81,8 @@ resource "aws_eks_addon" "addons" {
   cluster_name             = aws_eks_cluster.main.name
   addon_name               = each.value.name
   addon_version            = each.value.version
-  resolve_conflicts        = try(each.value.resolve_conflicts, "OVERWRITE")
+  resolve_conflicts_on_create = try(each.value.resolve_conflicts, "OVERWRITE")
+  resolve_conflicts_on_update = try(each.value.resolve_conflicts, "OVERWRITE")
   service_account_role_arn = try(each.value.service_account_role_arn, null)
   preserve                 = try(each.value.preserve, true)
 
